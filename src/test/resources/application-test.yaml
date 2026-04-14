@@ -1,10 +1,7 @@
 spring:
-  application:
-    name: project1
-
   jpa:
     open-in-view: false
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
 
@@ -14,4 +11,4 @@ spring:
 
 logging:
   level:
-    liquibase: INFO
+    liquibase: WARN
