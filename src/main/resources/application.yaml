@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: project1
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/project1
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    open-in-view: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+logging:
+  level:
+    liquibase: INFO
