@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-smoke-test
+  namespace: order-unf3x
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          command: ["k6", "run", "/scripts/smoke.js"]
+          env:
+            - name: BASE_URL
+              value: "http://order-service.order-unf3x.svc.cluster.local:8080"
+          volumeMounts:
+            - name: k6-scripts-volume
+              mountPath: /scripts
+      volumes:
+        - name: k6-scripts-volume
+          configMap:
+            name: k6-scripts

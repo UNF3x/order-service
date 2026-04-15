@@ -1,5 +1,6 @@
 target
-.idea
 .git
 .gitignore
+node_modules
 README.md
+Dockerfile

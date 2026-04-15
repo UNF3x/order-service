@@ -2,27 +2,26 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
-
-COPY pom.xml .
+# Копируем только то, что влияет на зависимости
+COPY pom.xml mvnw mvnw.cmd ./
 COPY .mvn .mvn
-COPY mvnw .
-COPY mvnw.cmd .
-RUN chmod +x mvnw
-
-RUN ./mvnw dependency:go-offline
-
-COPY src src
-
-RUN ./mvnw clean package -DskipTests
-
+# Кэшируем зависимости
+RUN ./mvnw -B dependency:go-offline
+# Копируем остальной код
+COPY src ./src
+# Сборка
+RUN ./mvnw -B clean package -DskipTests
 
 # ===== Stage 2: runtime =====
-FROM eclipse-temurin:21-jre
-
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-
-COPY --from=build /app/target/*.jar app.jar
-
+# Безопасность: non-root пользователь
+RUN useradd -r -u 1001 appuser
+# Копируем jar
+COPY --from=build /app/target/*jar /app/app.jar
+# Права
+RUN chown appuser:appuser /app/app.jar
+USER appuser
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# JVM оптимизирована под контейнер
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]

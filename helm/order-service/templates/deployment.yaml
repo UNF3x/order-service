@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "order-service.fullname" . }}
+  labels:
+    app: {{ include "order-service.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "order-service.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "order-service.name" . }}
+    spec:
+      containers:
+        - name: {{ include "order-service.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.env.SPRING_DATASOURCE_URL | quote }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.env.SPRING_DATASOURCE_USERNAME | quote }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.env.SPRING_DATASOURCE_PASSWORD | quote }}
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: {{ .Values.env.SPRING_JPA_HIBERNATE_DDL_AUTO | quote }}
+            - name: SPRING_LIQUIBASE_ENABLED
+              value: {{ .Values.env.SPRING_LIQUIBASE_ENABLED | quote }}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
